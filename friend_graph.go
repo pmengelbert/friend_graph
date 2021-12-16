@@ -85,7 +85,7 @@ func main() {
 func isFriend(n int, friends [][]int, f1, f2 int) (bool, error) {
 	visited := make(map[int]bool)
 
-	graph := makeGraph(n, friends)
+	graph := makeGraph(friends)
 
 	// optionally print the graph by uncommenting the following:
 	// printGraph(graph)
@@ -138,7 +138,7 @@ func printGraph(g map[int]*ListNode) {
 
 // assumes there are no duplicate pairings in the input
 // i.e. friends = [[1, 2], [1, 2]] shall not appear in the input
-func makeGraph(size int, friends [][]int) map[int][]int {
+func makeGraph(friends [][]int) map[int][]int {
 	graphBuilder := make(map[int][]int)
 	for _, pair := range friends {
 		f1 := pair[0]
