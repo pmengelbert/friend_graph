@@ -62,6 +62,7 @@ func (q *Queue) isEmpty() bool {
 
 func main() {
 	friends := [][]int{{1, 2}, {3, 4}, {3, 6}, {6, 7}, {1, 9}}
+	fmt.Println("Input matrix:", friends)
 	n := 7
 
 	f1 := 4
@@ -103,9 +104,7 @@ func isFriend(n int, friends [][]int, f1, f2 int) (bool, error) {
 		}
 
 		list := graph[nodeIndex]
-		for current := list; current != nil; current = current.Next {
-			val := current.Val
-
+		for _, val := range list {
 			if val == f2 {
 				return true, nil
 			}
@@ -139,9 +138,7 @@ func printGraph(g map[int]*ListNode) {
 
 // assumes there are no duplicate pairings in the input
 // i.e. friends = [[1, 2], [1, 2]] shall not appear in the input
-func makeGraph(size int, friends [][]int) map[int]*ListNode {
-	nodes := make(map[int]*ListNode)
-
+func makeGraph(size int, friends [][]int) map[int][]int {
 	graphBuilder := make(map[int][]int)
 	for _, pair := range friends {
 		f1 := pair[0]
@@ -151,31 +148,5 @@ func makeGraph(size int, friends [][]int) map[int]*ListNode {
 		graphBuilder[f2] = append(graphBuilder[f2], f1)
 	}
 
-	// making two passes is not ideal, but I wanted to quickly provide a working version of the code.
-	for k, v := range graphBuilder {
-		if len(v) == 0 {
-			nodes[k] = nil
-			continue
-		}
-
-		head := &ListNode{
-			Val:  v[0],
-			Next: nil,
-		}
-		last := head
-
-		for _, val := range v[1:] {
-			newNode := &ListNode{
-				Val:  val,
-				Next: nil,
-			}
-
-			last.Next = newNode
-			last = newNode
-		}
-
-		nodes[k] = head
-	}
-
-	return nodes
+	return graphBuilder
 }
