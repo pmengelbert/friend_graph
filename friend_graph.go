@@ -19,8 +19,13 @@ type (
 func NewQueue(n int) *Queue {
 	return &Queue{
 		size: n,
+		// the maximum size of the queue is the number of unique friends in all pairings.
+		// Thus, the size of the ringBuffer needs to be able to accomodate 2n elements.
+		// For example, consider the case where the input is [[1, 2], [3, 4], [5, 6], [7, 8]],
+		// n is equal to 4 because there are 4 pairings, but there are 8 friends.
+		//
 		// one unit of storage is left unused; explanation found in Knuth 2.2.2, exercise 1
-		ringBuffer: make([]int, n+1),
+		ringBuffer: make([]int, 2*n+1),
 		front:      1,
 		rear:       1,
 	}
