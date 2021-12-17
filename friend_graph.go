@@ -4,61 +4,59 @@ import "fmt"
 
 type (
 	Queue struct {
-		size       int
-		ringBuffer []int
-		front      int // points just below the front of the queue
-		rear       int
-	}
-
-	ListNode struct {
-		Val  int
-		Next *ListNode
+		size   int
+		buffer []int
+		front  int
+		rear   int
 	}
 )
 
-func NewQueue(n int) *Queue {
+func NewQueue() *Queue {
 	return &Queue{
-		size: n,
-		// the maximum size of the queue is the number of unique friends in all pairings.
-		// Thus, the size of the ringBuffer needs to be able to accomodate 2n elements.
-		// For example, consider the case where the input is [[1, 2], [3, 4], [5, 6], [7, 8]],
-		// n is equal to 4 because there are 4 pairings, but there are 8 friends.
-		//
-		// one unit of storage is left unused; explanation found in Knuth 2.2.2, exercise 1
-		ringBuffer: make([]int, 2*n+1),
-		front:      1,
-		rear:       1,
+		size:   4,
+		buffer: make([]int, 5),
+		front:  0,
+		rear:   0,
 	}
 }
 
-func (q *Queue) insert(val int) error {
+func (q *Queue) Insert(e int) {
 	if q.rear == q.size {
-		q.rear = 1
+		q.rear = 0
 	} else {
 		q.rear++
 	}
 
 	if q.rear == q.front {
-		return fmt.Errorf("overflow detected")
+		q.size *= 2
+		newBuf := make([]int, q.size+1)
+
+		latter := q.buffer[q.front:]
+		copy(newBuf, latter)
+		q.front = 0
+
+		former := q.buffer[:q.rear]
+		copy(newBuf[len(latter):], former)
+		q.rear = len(latter) + len(former)
+
+		q.buffer = newBuf
 	}
 
-	q.ringBuffer[q.rear] = val
-
-	return nil
+	q.buffer[q.rear] = e
 }
 
-func (q *Queue) remove() (int, error) {
+func (q *Queue) Remove() (int, error) {
 	if q.front == q.rear {
-		return -1, fmt.Errorf("underflow detected")
+		return -1, fmt.Errorf("underflow!")
 	}
 
 	if q.front == q.size {
-		q.front = 1
+		q.front = 0
 	} else {
 		q.front++
 	}
 
-	return q.ringBuffer[q.front], nil
+	return q.buffer[q.front], nil
 }
 
 func (q *Queue) isEmpty() bool {
@@ -95,13 +93,13 @@ func isFriend(n int, friends [][]int, f1, f2 int) (bool, error) {
 	// optionally print the graph by uncommenting the following:
 	// printGraph(graph)
 
-	queue := NewQueue(n)
+	queue := NewQueue()
 
 	// execute the search using the queue for breadth-first
 
 	var err error
 	nodeIndex := f1
-	queue.insert(f1)
+	queue.Insert(f1)
 
 	for { // will exit when queue is empty
 		if err != nil {
@@ -115,7 +113,7 @@ func isFriend(n int, friends [][]int, f1, f2 int) (bool, error) {
 			}
 
 			if !visitedOrAlreadyQueued[val] {
-				queue.insert(val)
+				queue.Insert(val)
 				visitedOrAlreadyQueued[val] = true
 			}
 		}
@@ -124,21 +122,10 @@ func isFriend(n int, friends [][]int, f1, f2 int) (bool, error) {
 			break
 		}
 
-		nodeIndex, err = queue.remove()
+		nodeIndex, err = queue.Remove()
 	}
 
 	return false, nil
-}
-
-func printGraph(g map[int]*ListNode) {
-	for k, v := range g {
-		fmt.Printf("%d", k)
-
-		for current := v; current != nil; current = current.Next {
-			fmt.Printf(" -> %d", current.Val)
-		}
-		fmt.Printf("\n")
-	}
 }
 
 // assumes there are no duplicate pairings in the input
