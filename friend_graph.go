@@ -88,7 +88,7 @@ func main() {
 }
 
 func isFriend(n int, friends [][]int, f1, f2 int) (bool, error) {
-	visited := make(map[int]bool)
+	visitedOrAlreadyQueued := make(map[int]bool)
 
 	graph := makeGraph(friends)
 
@@ -114,9 +114,9 @@ func isFriend(n int, friends [][]int, f1, f2 int) (bool, error) {
 				return true, nil
 			}
 
-			if !visited[val] {
+			if !visitedOrAlreadyQueued[val] {
 				queue.insert(val)
-				visited[val] = true
+				visitedOrAlreadyQueued[val] = true
 			}
 		}
 
